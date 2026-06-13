@@ -25,6 +25,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.res.stringResource
+import app.batstats.R
 import app.batstats.battery.util.BatteryStatsParser
 import app.batstats.battery.util.RootStatsCollector
 import app.batstats.viewmodel.DetailedStatsViewModel
@@ -57,12 +59,12 @@ fun DetailedStatsScreen(
 
     val tabs = remember {
         listOf(
-            StatsTab("Overview", Icons.Outlined.Dashboard),
-            StatsTab("Apps", Icons.Outlined.Apps),
-            StatsTab("Wakelocks", Icons.Outlined.Alarm),
-            StatsTab("Network", Icons.Outlined.Wifi),
-            StatsTab("Alarms", Icons.Outlined.Schedule),
-            StatsTab("System", Icons.Outlined.SettingsApplications),
+            StatsTab("概览", Icons.Outlined.Dashboard),
+            StatsTab("应用", Icons.Outlined.Apps),
+            StatsTab("唤醒锁", Icons.Outlined.Alarm),
+            StatsTab("网络", Icons.Outlined.Wifi),
+            StatsTab("警报", Icons.Outlined.Schedule),
+            StatsTab("系统", Icons.Outlined.SettingsApplications),
             StatsTab("Root", Icons.Outlined.AdminPanelSettings)
         )
     }
@@ -82,7 +84,7 @@ fun DetailedStatsScreen(
             LargeTopAppBar(
                 title = {
                     Column {
-                        Text("Detailed Stats")
+                        Text(stringResource(R.string.detailed_stats))
                         AnimatedVisibility(visible = lastRefresh > 0) {
                             val timeFormatter = remember(Locale.getDefault()) {
                                 DateTimeFormatter.ofPattern("HH:mm:ss", Locale.getDefault())
@@ -93,7 +95,7 @@ fun DetailedStatsScreen(
                                     .format(timeFormatter)
                             }
                             Text(
-                                "Updated $formatted",
+                                "更新于 $formatted",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -102,7 +104,7 @@ fun DetailedStatsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -112,20 +114,20 @@ fun DetailedStatsScreen(
                         )
                     } else {
                         IconButton(onClick = { scope.launch { vm.refresh() } }) {
-                            Icon(Icons.Outlined.Refresh, "Refresh")
+                            Icon(Icons.Outlined.Refresh, "刷新")
                         }
                     }
                     IconButton(onClick = {
                         scope.launch {
                             if (vm.resetStats()) {
-                                snackbarHost.showSnackbar("Stats reset successfully")
+                                snackbarHost.showSnackbar("统计已重置")
                                 vm.refresh()
                             } else {
-                                snackbarHost.showSnackbar("Failed to reset stats")
+                                snackbarHost.showSnackbar("统计重置失败")
                             }
                         }
                     }) {
-                        Icon(Icons.Outlined.RestartAlt, "Reset stats")
+                        Icon(Icons.Outlined.RestartAlt, "重置统计")
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -232,17 +234,17 @@ private fun ShizukuRequiredCard(onRequestPermission: () -> Unit) {
                     tint = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    "Shizuku Required",
+                    "需要 Shizuku",
                     style = MaterialTheme.typography.titleLarge
                 )
                 Text(
-                    "Detailed battery stats require Shizuku to be running and permission granted. " +
-                            "Shizuku provides ADB-level access without root.",
+                    "详细电池统计需要 Shizuku 正在运行并已授予权限。" +
+                            "Shizuku 提供无需 Root 的 ADB 级别访问权限。",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Button(onClick = onRequestPermission) {
-                    Text("Grant Permission")
+                    Text(stringResource(R.string.grant_permission))
                 }
             }
         }
@@ -271,40 +273,40 @@ private fun OverviewTab(
 
 @Composable
 private fun SummaryCard(snapshot: BatteryStatsParser.FullSnapshot?) {
-    StatsCard(title = "Summary", icon = Icons.Outlined.Summarize) {
+    StatsCard(title = stringResource(R.string.summary), icon = Icons.Outlined.Summarize) {
         if (snapshot == null) {
-            Text("No data available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("暂无数据", color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             val hours = snapshot.batteryRealtimeMs / 3600000.0
             val screenHours = snapshot.screenOnTimeMs / 3600000.0
 
-            StatRow("Time on battery", String.format(Locale.getDefault(), "%.1f hours", hours))
-            StatRow("Screen on time", String.format(Locale.getDefault(), "%.1f hours", screenHours))
-            StatRow("Estimated capacity", "${snapshot.estimatedCapacityMah} mAh")
-            StatRow("Apps tracked", "${snapshot.apps.size}")
-            StatRow("Wakelocks", "${snapshot.wakelocks.size}")
-            StatRow("Kernel wakelocks", "${snapshot.kernelWakelocks.size}")
+            StatRow("电池使用时间", String.format(Locale.getDefault(), "%.1f hours", hours))
+            StatRow("屏幕开启时间", String.format(Locale.getDefault(), "%.1f hours", screenHours))
+            StatRow("估算容量", "${snapshot.estimatedCapacityMah} mAh")
+            StatRow("追踪的应用", "${snapshot.apps.size}")
+            StatRow("唤醒锁", "${snapshot.wakelocks.size}")
+            StatRow("内核唤醒锁", "${snapshot.kernelWakelocks.size}")
         }
     }
 }
 
 @Composable
 private fun DischargeBreakdownCard(snapshot: BatteryStatsParser.FullSnapshot?) {
-    StatsCard(title = "Discharge Breakdown", icon = Icons.Outlined.BatteryAlert) {
+    StatsCard(title = "耗电分解", icon = Icons.Outlined.BatteryAlert) {
         if (snapshot == null) {
-            Text("No data available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("暂无数据", color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 DischargeBox(
-                    label = "Screen On",
+                    label = "屏幕开启",
                     percent = snapshot.screenOnDischargePercent,
                     color = MaterialTheme.colorScheme.primary
                 )
                 DischargeBox(
-                    label = "Screen Off",
+                    label = "屏幕关闭",
                     percent = snapshot.screenOffDischargePercent,
                     color = MaterialTheme.colorScheme.tertiary
                 )
@@ -337,9 +339,9 @@ private fun DischargeBox(label: String, percent: Float, color: Color) {
 
 @Composable
 private fun ScreenTimeCard(snapshot: BatteryStatsParser.FullSnapshot?) {
-    StatsCard(title = "Screen Time Analysis", icon = Icons.Outlined.Smartphone) {
+    StatsCard(title = stringResource(R.string.screen_time_analysis), icon = Icons.Outlined.Smartphone) {
         if (snapshot == null) {
-            Text("No data available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("暂无数据", color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             val totalMs = snapshot.batteryRealtimeMs.toFloat().coerceAtLeast(1f)
             val screenOnPercent = (snapshot.screenOnTimeMs / totalMs * 100)
@@ -350,14 +352,14 @@ private fun ScreenTimeCard(snapshot: BatteryStatsParser.FullSnapshot?) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Screen On", style = MaterialTheme.typography.labelMedium)
+                    Text("屏幕开启", style = MaterialTheme.typography.labelMedium)
                     LinearWavyProgressIndicator(
                         progress = { screenOnPercent / 100f },
                         modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)),
                         color = MaterialTheme.colorScheme.primary,
                     )
                     Text(
-                        String.format(Locale.getDefault(), "%.1f%% of battery time", screenOnPercent),
+                        String.format(Locale.getDefault(), "占电池时间的 %.1f%%", screenOnPercent),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -373,19 +375,19 @@ private fun ScreenTimeCard(snapshot: BatteryStatsParser.FullSnapshot?) {
                 snapshot.screenOffDischargePercent / ((snapshot.batteryRealtimeMs - snapshot.screenOnTimeMs) / 3600000.0)
             } else 0.0
 
-            StatRow("Drain/hour (screen on)", String.format(Locale.getDefault(), "%.2f%%", drainPerHourScreenOn))
-            StatRow("Drain/hour (screen off)", String.format(Locale.getDefault(), "%.2f%%", drainPerHourScreenOff))
+            StatRow("耗电/小时（屏幕开启）", String.format(Locale.getDefault(), "%.2f%%", drainPerHourScreenOn))
+            StatRow("耗电/小时（屏幕关闭）", String.format(Locale.getDefault(), "%.2f%%", drainPerHourScreenOff))
         }
     }
 }
 
 @Composable
 private fun SignalQualityCard(snapshot: BatteryStatsParser.FullSnapshot?) {
-    StatsCard(title = "Signal Quality", icon = Icons.Outlined.SignalCellularAlt) {
+    StatsCard(title = stringResource(R.string.signal_quality), icon = Icons.Outlined.SignalCellularAlt) {
         if (snapshot == null || snapshot.signalStrength.isEmpty()) {
-            Text("No signal data available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.no_signal_data), color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
-            val signalLabels = listOf("None", "Poor", "Moderate", "Good", "Great")
+            val signalLabels = listOf("无", "差", "一般", "良好", "优秀")
             val colors = listOf(
                 MaterialTheme.colorScheme.error,
                 MaterialTheme.colorScheme.error.copy(alpha = 0.7f),
@@ -394,7 +396,7 @@ private fun SignalQualityCard(snapshot: BatteryStatsParser.FullSnapshot?) {
                 MaterialTheme.colorScheme.primary
             )
 
-            Text("Mobile Signal", style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.mobile_signal), style = MaterialTheme.typography.titleSmall)
             Spacer(Modifier.height(8.dp))
 
             snapshot.signalStrength.forEachIndexed { index, stat ->
@@ -403,7 +405,7 @@ private fun SignalQualityCard(snapshot: BatteryStatsParser.FullSnapshot?) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        signalLabels.getOrNull(index) ?: "Level $index",
+                        signalLabels.getOrNull(index) ?: "级别 $index",
                         modifier = Modifier.width(80.dp),
                         style = MaterialTheme.typography.bodySmall
                     )
@@ -424,7 +426,7 @@ private fun SignalQualityCard(snapshot: BatteryStatsParser.FullSnapshot?) {
 
             if (snapshot.wifiSignal.isNotEmpty()) {
                 Spacer(Modifier.height(16.dp))
-                Text("WiFi Signal", style = MaterialTheme.typography.titleSmall)
+                Text(stringResource(R.string.wifi_signal), style = MaterialTheme.typography.titleSmall)
                 Spacer(Modifier.height(8.dp))
 
                 snapshot.wifiSignal.forEachIndexed { index, stat ->
@@ -433,7 +435,7 @@ private fun SignalQualityCard(snapshot: BatteryStatsParser.FullSnapshot?) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            signalLabels.getOrNull(index) ?: "Level $index",
+                            signalLabels.getOrNull(index) ?: "级别 $index",
                             modifier = Modifier.width(80.dp),
                             style = MaterialTheme.typography.bodySmall
                         )
@@ -458,32 +460,32 @@ private fun SignalQualityCard(snapshot: BatteryStatsParser.FullSnapshot?) {
 
 @Composable
 private fun DozeStatsCard(doze: BatteryStatsParser.DozeStats?) {
-    StatsCard(title = "Doze Statistics", icon = Icons.Outlined.PowerSettingsNew) {
+    StatsCard(title = stringResource(R.string.doze_statistics), icon = Icons.Outlined.PowerSettingsNew) {
         if (doze == null) {
-            Text("No Doze data available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.no_doze_data), color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
-            StatRow("Deep Doze time", formatDuration(doze.deepIdleTimeMs))
-            StatRow("Deep Doze count", "${doze.deepIdleCount}")
-            StatRow("Light Doze time", formatDuration(doze.lightIdleTimeMs))
-            StatRow("Light Doze count", "${doze.lightIdleCount}")
-            StatRow("Maintenance windows", "${doze.maintenanceCount}")
-            StatRow("Maintenance time", formatDuration(doze.maintenanceTimeMs))
+            StatRow("深度 Doze 时间", formatDuration(doze.deepIdleTimeMs))
+            StatRow("深度 Doze 次数", "${doze.deepIdleCount}")
+            StatRow("轻度 Doze 时间", formatDuration(doze.lightIdleTimeMs))
+            StatRow("轻度 Doze 次数", "${doze.lightIdleCount}")
+            StatRow("维护窗口", "${doze.maintenanceCount}")
+            StatRow("维护时间", formatDuration(doze.maintenanceTimeMs))
         }
     }
 }
 
 @Composable
 private fun BluetoothCard(bluetooth: BatteryStatsParser.BluetoothStats?) {
-    StatsCard(title = "Bluetooth", icon = Icons.Outlined.Bluetooth) {
+    StatsCard(title = stringResource(R.string.bluetooth), icon = Icons.Outlined.Bluetooth) {
         if (bluetooth == null) {
-            Text("No Bluetooth data available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.no_bluetooth_data), color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
-            StatRow("Idle time", formatDuration(bluetooth.idleTimeMs))
-            StatRow("RX time", formatDuration(bluetooth.rxTimeMs))
-            StatRow("TX time", formatDuration(bluetooth.txTimeMs))
-            StatRow("Power usage", String.format(Locale.getDefault(), "%.2f mAh", bluetooth.powerMah))
+            StatRow("空闲时间", formatDuration(bluetooth.idleTimeMs))
+            StatRow("接收时间", formatDuration(bluetooth.rxTimeMs))
+            StatRow("发送时间", formatDuration(bluetooth.txTimeMs))
+            StatRow("功耗", String.format(Locale.getDefault(), "%.2f mAh", bluetooth.powerMah))
             if (bluetooth.scanTimeMs > 0) {
-                StatRow("Scan time", formatDuration(bluetooth.scanTimeMs))
+                StatRow("扫描时间", formatDuration(bluetooth.scanTimeMs))
             }
         }
     }
@@ -494,31 +496,31 @@ private fun CurrentStateCard(
     deviceIdle: BatteryStatsParser.DeviceIdleInfo?,
     powerManager: BatteryStatsParser.PowerManagerInfo?
 ) {
-    StatsCard(title = "Current State", icon = Icons.Outlined.Info) {
+    StatsCard(title = "当前状态", icon = Icons.Outlined.Info) {
         if (deviceIdle != null) {
-            StatRow("Doze state", deviceIdle.currentState)
-            StatRow("Light state", deviceIdle.lightState)
-            StatRow("Deep Doze enabled", if (deviceIdle.deepEnabled) "Yes" else "No")
-            StatRow("Light Doze enabled", if (deviceIdle.lightEnabled) "Yes" else "No")
+            StatRow("Doze 状态", deviceIdle.currentState)
+            StatRow("轻睡状态", deviceIdle.lightState)
+            StatRow("深度 Doze 已启用", if (deviceIdle.deepEnabled) "是" else "否")
+            StatRow("轻度 Doze 已启用", if (deviceIdle.lightEnabled) "是" else "否")
         }
 
         if (powerManager != null) {
             Spacer(Modifier.height(8.dp))
-            StatRow("Screen", if (powerManager.isScreenOn) "On" else "Off")
-            StatRow("Battery level", "${powerManager.batteryLevel}%")
-            StatRow("Battery status", powerManager.batteryStatus)
-            StatRow("Low power mode", if (powerManager.lowPowerMode) "Yes" else "No")
-            StatRow("Device idle mode", powerManager.deviceIdleMode)
+            StatRow("屏幕", if (powerManager.isScreenOn) "开启" else "关闭")
+            StatRow("电池电量", "${powerManager.batteryLevel}%")
+            StatRow("电池状态", powerManager.batteryStatus)
+            StatRow("省电模式", if (powerManager.lowPowerMode) "是" else "否")
+            StatRow("设备空闲模式", powerManager.deviceIdleMode)
 
             if (powerManager.holdingWakeLocks.isNotEmpty()) {
                 Spacer(Modifier.height(8.dp))
-                Text("Active wake locks: ${powerManager.holdingWakeLocks.size}",
+                Text("活跃唤醒锁：${powerManager.holdingWakeLocks.size}",
                     style = MaterialTheme.typography.labelMedium)
             }
         }
 
         if (deviceIdle == null && powerManager == null) {
-            Text("No state data available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("暂无状态数据", color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -559,7 +561,7 @@ private fun AppsTab(apps: List<BatteryStatsParser.AppPowerStats>) {
             FilterChip(
                 selected = showSystemApps,
                 onClick = { showSystemApps = !showSystemApps },
-                label = { Text("System apps") }
+                label = { Text(stringResource(R.string.system_apps)) }
             )
 
             Spacer(Modifier.weight(1f))
@@ -571,7 +573,7 @@ private fun AppsTab(apps: List<BatteryStatsParser.AppPowerStats>) {
             ) {
                 AssistChip(
                     onClick = { expanded = true },
-                    label = { Text("Sort: ${sortBy.label}") },
+                    label = { Text("排序：${sortBy.label}") },
                     trailingIcon = { Icon(Icons.Default.ArrowDropDown, null) },
                     modifier = Modifier.menuAnchor()
                 )
@@ -598,7 +600,7 @@ private fun AppsTab(apps: List<BatteryStatsParser.AppPowerStats>) {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No apps found", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.no_apps_found), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
             LazyColumn(
@@ -614,11 +616,11 @@ private fun AppsTab(apps: List<BatteryStatsParser.AppPowerStats>) {
 }
 
 private enum class AppSortOption(val label: String) {
-    POWER("Power"),
-    CPU("CPU Time"),
-    WAKELOCK("Wakelock"),
-    NETWORK("Network"),
-    FOREGROUND("Foreground")
+    POWER("功耗"),
+    CPU("CPU 时间"),
+    WAKELOCK("唤醒锁"),
+    NETWORK("网络"),
+    FOREGROUND("前台")
 }
 
 @Composable
@@ -675,32 +677,32 @@ private fun AppStatsCard(rank: Int, app: BatteryStatsParser.AppPowerStats) {
                     HorizontalDivider()
                     Spacer(Modifier.height(8.dp))
 
-                    Text("Power Breakdown", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.power_breakdown), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                     StatRow("CPU", String.format(Locale.getDefault(), "%.2f mAh", app.cpuPowerMah))
-                    StatRow("Wakelock", String.format(Locale.getDefault(), "%.2f mAh", app.wakeLockPowerMah))
-                    StatRow("Mobile radio", String.format(Locale.getDefault(), "%.2f mAh", app.mobilePowerMah))
+                    StatRow("唤醒锁", String.format(Locale.getDefault(), "%.2f mAh", app.wakeLockPowerMah))
+                    StatRow("移动网络", String.format(Locale.getDefault(), "%.2f mAh", app.mobilePowerMah))
                     StatRow("WiFi", String.format(Locale.getDefault(), "%.2f mAh", app.wifiPowerMah))
                     StatRow("GPS", String.format(Locale.getDefault(), "%.2f mAh", app.gpsPowerMah))
-                    StatRow("Sensors", String.format(Locale.getDefault(), "%.2f mAh", app.sensorPowerMah))
-                    StatRow("Camera", String.format(Locale.getDefault(), "%.2f mAh", app.cameraPowerMah))
-                    StatRow("Bluetooth", String.format(Locale.getDefault(), "%.2f mAh", app.bluetoothPowerMah))
+                    StatRow("传感器", String.format(Locale.getDefault(), "%.2f mAh", app.sensorPowerMah))
+                    StatRow("相机", String.format(Locale.getDefault(), "%.2f mAh", app.cameraPowerMah))
+                    StatRow("蓝牙", String.format(Locale.getDefault(), "%.2f mAh", app.bluetoothPowerMah))
 
                     Spacer(Modifier.height(8.dp))
-                    Text("Time Usage", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                    StatRow("CPU time", formatDuration(app.cpuTimeMs))
-                    StatRow("Wakelock time", formatDuration(app.wakeLockTimeMs))
-                    StatRow("Foreground", formatDuration(app.foregroundTimeMs))
-                    StatRow("Foreground service", formatDuration(app.foregroundServiceTimeMs))
-                    StatRow("Top", formatDuration(app.topTimeMs))
+                    Text(stringResource(R.string.time_usage), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    StatRow("CPU 时间", formatDuration(app.cpuTimeMs))
+                    StatRow("唤醒锁时间", formatDuration(app.wakeLockTimeMs))
+                    StatRow("前台", formatDuration(app.foregroundTimeMs))
+                    StatRow("前台服务", formatDuration(app.foregroundServiceTimeMs))
+                    StatRow("顶层", formatDuration(app.topTimeMs))
                     StatRow("GPS", formatDuration(app.gpsTimeMs))
-                    StatRow("Sensors", formatDuration(app.sensorTimeMs))
+                    StatRow("传感器", formatDuration(app.sensorTimeMs))
 
                     Spacer(Modifier.height(8.dp))
-                    Text("Network", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                    StatRow("Mobile RX", formatBytes(app.mobileRxBytes))
-                    StatRow("Mobile TX", formatBytes(app.mobileTxBytes))
-                    StatRow("WiFi RX", formatBytes(app.wifiRxBytes))
-                    StatRow("WiFi TX", formatBytes(app.wifiTxBytes))
+                    Text(stringResource(R.string.network), style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    StatRow("移动接收", formatBytes(app.mobileRxBytes))
+                    StatRow("移动发送", formatBytes(app.mobileTxBytes))
+                    StatRow("WiFi 接收", formatBytes(app.wifiRxBytes))
+                    StatRow("WiFi 发送", formatBytes(app.wifiTxBytes))
                 }
             }
         }
@@ -724,12 +726,12 @@ private fun WakelocksTab(
             FilterChip(
                 selected = !showKernel,
                 onClick = { showKernel = false },
-                label = { Text("App wakelocks (${wakelocks.size})") }
+                label = { Text(stringResource(R.string.app_wakelocks, wakelocks.size)) }
             )
             FilterChip(
                 selected = showKernel,
                 onClick = { showKernel = true },
-                label = { Text("Kernel (${kernelWakelocks.size})") }
+                label = { Text("内核（${kernelWakelocks.size}）") }
             )
         }
 
@@ -740,7 +742,7 @@ private fun WakelocksTab(
             if (showKernel) {
                 if (kernelWakelocks.isEmpty()) {
                     item {
-                        Text("No kernel wakelocks found", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.no_kernel_wakelocks), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     items(kernelWakelocks, key = { it.name }) { wl ->
@@ -750,7 +752,7 @@ private fun WakelocksTab(
             } else {
                 if (wakelocks.isEmpty()) {
                     item {
-                        Text("No app wakelocks found", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.no_app_wakelocks), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 } else {
                     items(wakelocks, key = { "${it.uid}_${it.tag}" }) { wl ->
@@ -799,11 +801,11 @@ private fun WakelockCard(wl: BatteryStatsParser.WakelockStats) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("Count", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.count), style = MaterialTheme.typography.labelSmall)
                     Text("${wl.count}", style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Total time", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.total_time), style = MaterialTheme.typography.labelSmall)
                     Text(formatDuration(wl.totalTimeMs), style = MaterialTheme.typography.bodyMedium)
                 }
             }
@@ -829,15 +831,15 @@ private fun KernelWakelockCard(wl: BatteryStatsParser.KernelWakelockStats) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("Count", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.count), style = MaterialTheme.typography.labelSmall)
                     Text("${wl.count}", style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Active", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.active), style = MaterialTheme.typography.labelSmall)
                     Text("${wl.activeCount}", style = MaterialTheme.typography.bodyMedium)
                 }
                 Column(horizontalAlignment = Alignment.End) {
-                    Text("Total time", style = MaterialTheme.typography.labelSmall)
+                    Text(stringResource(R.string.total_time), style = MaterialTheme.typography.labelSmall)
                     Text(formatDuration(wl.totalTimeMs), style = MaterialTheme.typography.bodyMedium)
                 }
             }
@@ -877,7 +879,7 @@ private fun NetworkTab(network: List<BatteryStatsParser.NetworkStats>) {
 
         if (sorted.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("No network data available", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.no_network_data), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         } else {
             LazyColumn(
@@ -893,8 +895,8 @@ private fun NetworkTab(network: List<BatteryStatsParser.NetworkStats>) {
 }
 
 private enum class NetworkSortOption(val label: String) {
-    TOTAL("Total"),
-    MOBILE("Mobile"),
+    TOTAL("总计"),
+    MOBILE("移动"),
     WIFI("WiFi")
 }
 
@@ -916,7 +918,7 @@ private fun NetworkCard(net: BatteryStatsParser.NetworkStats) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text("Mobile", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
+                    Text("移动", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
                     Text(
                         "↓ ${formatBytes(net.mobileRxBytes)}  ↑ ${formatBytes(net.mobileTxBytes)}",
                         style = MaterialTheme.typography.bodySmall
@@ -947,24 +949,24 @@ private fun AlarmsJobsTab(
             Tab(
                 selected = selected == 0,
                 onClick = { selected = 0 },
-                text = { Text("Alarms (${alarms.size})") }
+                text = { Text("警报（${alarms.size}）") }
             )
             Tab(
                 selected = selected == 1,
                 onClick = { selected = 1 },
-                text = { Text("Jobs (${jobs.size})") }
+                text = { Text("作业（${jobs.size}）") }
             )
             Tab(
                 selected = selected == 2,
                 onClick = { selected = 2 },
-                text = { Text("Syncs (${syncs.size})") }
+                text = { Text("同步（${syncs.size}）") }
             )
         }
 
         when (selected) {
             0 -> {
                 if (alarms.isEmpty()) {
-                    EmptyListMessage("No alarm data")
+                    EmptyListMessage("暂无警报数据")
                 } else {
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
@@ -978,7 +980,7 @@ private fun AlarmsJobsTab(
             }
             1 -> {
                 if (jobs.isEmpty()) {
-                    EmptyListMessage("No job data")
+                    EmptyListMessage("暂无作业数据")
                 } else {
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
@@ -992,7 +994,7 @@ private fun AlarmsJobsTab(
             }
             2 -> {
                 if (syncs.isEmpty()) {
-                    EmptyListMessage("No sync data")
+                    EmptyListMessage("暂无同步数据")
                 } else {
                     LazyColumn(
                         contentPadding = PaddingValues(16.dp),
@@ -1016,9 +1018,9 @@ private fun AlarmCard(alarm: BatteryStatsParser.AlarmStats) {
             Text(alarm.packageName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                StatColumn("Count", "${alarm.count}")
-                StatColumn("Wakeups", "${alarm.wakeups}")
-                StatColumn("Time", formatDuration(alarm.totalTimeMs))
+                StatColumn(stringResource(R.string.count), "${alarm.count}")
+                StatColumn("唤醒次数", "${alarm.wakeups}")
+                StatColumn("时间", formatDuration(alarm.totalTimeMs))
             }
         }
     }
@@ -1032,8 +1034,8 @@ private fun JobCard(job: BatteryStatsParser.JobStats) {
             Text(job.packageName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                StatColumn("Count", "${job.count}")
-                StatColumn("Total time", formatDuration(job.totalTimeMs))
+                StatColumn(stringResource(R.string.count), "${job.count}")
+                StatColumn(stringResource(R.string.total_time), formatDuration(job.totalTimeMs))
             }
         }
     }
@@ -1047,8 +1049,8 @@ private fun SyncCard(sync: BatteryStatsParser.SyncStats) {
             Text(sync.packageName, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.height(8.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                StatColumn("Count", "${sync.count}")
-                StatColumn("Total time", formatDuration(sync.totalTimeMs))
+                StatColumn(stringResource(R.string.count), "${sync.count}")
+                StatColumn(stringResource(R.string.total_time), formatDuration(sync.totalTimeMs))
             }
         }
     }
@@ -1065,9 +1067,9 @@ private fun SystemTab(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         item {
-            StatsCard(title = "Process Statistics", icon = Icons.Outlined.Memory) {
+            StatsCard(title = stringResource(R.string.process_statistics), icon = Icons.Outlined.Memory) {
                 if (snapshot?.processStats.isNullOrEmpty()) {
-                    Text("No process data", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.no_process_data), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
                     snapshot.processStats.take(20).forEach { proc ->
                         Row(
@@ -1092,9 +1094,9 @@ private fun SystemTab(
         }
 
         item {
-            StatsCard(title = "Sensor Usage", icon = Icons.Outlined.Sensors) {
+            StatsCard(title = stringResource(R.string.sensor_usage), icon = Icons.Outlined.Sensors) {
                 if (snapshot?.sensors.isNullOrEmpty()) {
-                    Text("No sensor data", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.no_sensor_data), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
                     snapshot.sensors.take(15).forEach { sensor ->
                         Row(
@@ -1128,12 +1130,12 @@ private fun SystemTab(
         }
 
         item {
-            StatsCard(title = "Doze Whitelist", icon = Icons.Outlined.BatteryChargingFull) {
+            StatsCard(title = stringResource(R.string.doze_whitelist), icon = Icons.Outlined.BatteryChargingFull) {
                 if (deviceIdle == null) {
-                    Text("No whitelist data", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.no_whitelist), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
                     Text(
-                        "Whitelisted apps: ${deviceIdle.whitelistedApps.size}",
+                        "白名单应用：${deviceIdle.whitelistedApps.size}",
                         style = MaterialTheme.typography.titleSmall
                     )
                     Spacer(Modifier.height(4.dp))
@@ -1150,7 +1152,7 @@ private fun SystemTab(
                         }
                         if (deviceIdle.whitelistedApps.size > 10) {
                             Text(
-                                "... and ${deviceIdle.whitelistedApps.size - 10} more",
+                                "…以及另外 ${deviceIdle.whitelistedApps.size - 10} 个",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -1160,7 +1162,7 @@ private fun SystemTab(
                     if (deviceIdle.tempWhitelistedApps.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "Temporarily whitelisted: ${deviceIdle.tempWhitelistedApps.size}",
+                            "临时白名单：${deviceIdle.tempWhitelistedApps.size}",
                             style = MaterialTheme.typography.titleSmall
                         )
                         deviceIdle.tempWhitelistedApps.take(5).forEach { pkg ->
@@ -1176,9 +1178,9 @@ private fun SystemTab(
         }
 
         item {
-            StatsCard(title = "Suspend Blockers", icon = Icons.Outlined.Block) {
+            StatsCard(title = stringResource(R.string.suspend_blockers), icon = Icons.Outlined.Block) {
                 if (powerManager?.suspendBlockers.isNullOrEmpty()) {
-                    Text("No suspend blockers active", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.no_suspend_blockers), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 } else {
                     powerManager.suspendBlockers.forEach { blocker ->
                         Text(
@@ -1237,12 +1239,12 @@ private fun RootTab(
                         tint = MaterialTheme.colorScheme.error
                     )
                     Text(
-                        "Root Access Required",
+                        "需要 Root 权限",
                         style = MaterialTheme.typography.titleLarge
                     )
                     Text(
-                        "These statistics require root access to read kernel-level battery information, " +
-                                "including cycle count, true battery capacity, kernel wakelocks, and thermal data.",
+                        "这些统计需要 Root 权限来读取内核级电池信息，" +
+                                "包括循环次数、真实电池容量、内核唤醒锁和温度数据。",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -1251,16 +1253,16 @@ private fun RootTab(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Text("Root-only features:", style = MaterialTheme.typography.labelMedium)
+                            Text(stringResource(R.string.root_only), style = MaterialTheme.typography.labelMedium)
                             Spacer(Modifier.height(4.dp))
                             listOf(
-                                "Battery cycle count",
-                                "True capacity (design vs actual)",
-                                "Battery age/health percentage",
-                                "Kernel wakelocks (native)",
-                                "CPU frequency states",
-                                "Thermal zone monitoring",
-                                "Direct sysfs access"
+                                "电池循环次数",
+                                "真实容量（设计 vs 实际）",
+                                "电池老化/健康百分比",
+                                "内核唤醒锁（原生）",
+                                "CPU 频率状态",
+                                "温度区域监控",
+                                "直接 sysfs 访问"
                             ).forEach { feature ->
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -1293,7 +1295,7 @@ private fun RootTab(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Root Statistics",
+                        "Root 统计",
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -1313,7 +1315,7 @@ private fun RootTab(
                         if (isLoading) {
                             CircularWavyProgressIndicator(modifier = Modifier.size(20.dp))
                         } else {
-                            Icon(Icons.Outlined.Refresh, "Refresh")
+                            Icon(Icons.Outlined.Refresh, "刷新")
                         }
                     }
                 }
@@ -1344,9 +1346,9 @@ private fun RootTab(
 
 @Composable
 private fun BatteryHealthCard(battery: RootStatsCollector.KernelBatteryInfo?) {
-    StatsCard(title = "Battery Health (Kernel)", icon = Icons.Outlined.BatteryFull) {
+    StatsCard(title = stringResource(R.string.battery_health) + "（内核）", icon = Icons.Outlined.BatteryFull) {
         if (battery == null) {
-            Text("Could not read battery info from /sys", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.no_battery_info), color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             // Cycle count with visual indicator
             battery.cycleCount?.let { cycles ->
@@ -1356,9 +1358,9 @@ private fun BatteryHealthCard(battery: RootStatsCollector.KernelBatteryInfo?) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text("Cycle Count", style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.cycle_count), style = MaterialTheme.typography.labelMedium)
                         Text(
-                            "$cycles cycles",
+                            "$cycles 次循环",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
                             color = when {
@@ -1393,7 +1395,7 @@ private fun BatteryHealthCard(battery: RootStatsCollector.KernelBatteryInfo?) {
                 val actualMah = battery.chargeFull / 1000
                 val healthPct = battery.batteryAge ?: 0.0
 
-                Text("Capacity", style = MaterialTheme.typography.labelMedium)
+                Text(stringResource(R.string.capacity), style = MaterialTheme.typography.labelMedium)
                 Spacer(Modifier.height(4.dp))
 
                 Row(
@@ -1401,15 +1403,15 @@ private fun BatteryHealthCard(battery: RootStatsCollector.KernelBatteryInfo?) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("Design", style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.design), style = MaterialTheme.typography.labelSmall)
                         Text("$designMah mAh", style = MaterialTheme.typography.bodyMedium)
                     }
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("Current", style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.current), style = MaterialTheme.typography.labelSmall)
                         Text("$actualMah mAh", style = MaterialTheme.typography.bodyMedium)
                     }
                     Column(horizontalAlignment = Alignment.End) {
-                        Text("Health", style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.health), style = MaterialTheme.typography.labelSmall)
                         Text(
                             String.format(Locale.getDefault(), "%.1f%%", healthPct),
                             style = MaterialTheme.typography.bodyMedium,
@@ -1437,23 +1439,23 @@ private fun BatteryHealthCard(battery: RootStatsCollector.KernelBatteryInfo?) {
             }
 
             // Other stats
-            battery.technology?.let { StatRow("Technology", it) }
-            battery.health?.let { StatRow("Health status", it) }
-            battery.status?.let { StatRow("Status", it) }
+            battery.technology?.let { StatRow("技术", it) }
+            battery.health?.let { StatRow("健康状态", it) }
+            battery.status?.let { StatRow("状态", it) }
             battery.currentNow?.let {
-                StatRow("Current (kernel)", "${it / 1000} mA")
+                StatRow("电流（内核）", "${it / 1000} mA")
             }
             battery.voltageNow?.let {
-                StatRow("Voltage (kernel)", "${it / 1000} mV")
+                StatRow("电压（内核）", "${it / 1000} mV")
             }
             battery.tempNow?.let {
-                StatRow("Temperature", String.format(Locale.getDefault(), "%.1f °C", it / 10.0))
+                StatRow(stringResource(R.string.temperature), String.format(Locale.getDefault(), "%.1f °C", it / 10.0))
             }
             battery.timeToEmptyNow?.let {
-                if (it > 0) StatRow("Time to empty", formatDuration(it * 1000))
+                if (it > 0) StatRow("剩余时间", formatDuration(it * 1000))
             }
             battery.timeToFullNow?.let {
-                if (it > 0) StatRow("Time to full", formatDuration(it * 1000))
+                if (it > 0) StatRow("充满时间", formatDuration(it * 1000))
             }
         }
     }
@@ -1461,9 +1463,9 @@ private fun BatteryHealthCard(battery: RootStatsCollector.KernelBatteryInfo?) {
 
 @Composable
 private fun CpuFrequencyCard(cpuInfo: List<RootStatsCollector.CpuInfo>) {
-    StatsCard(title = "CPU Frequency", icon = Icons.Outlined.Speed) {
+    StatsCard(title = stringResource(R.string.cpu_frequency), icon = Icons.Outlined.Speed) {
         if (cpuInfo.isEmpty()) {
-            Text("Could not read CPU info", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.no_cpu_info), color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             cpuInfo.forEach { cpu ->
                 Column(modifier = Modifier.fillMaxWidth()) {
@@ -1473,7 +1475,7 @@ private fun CpuFrequencyCard(cpuInfo: List<RootStatsCollector.CpuInfo>) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Cluster ${cpu.cluster}",
+                            "集群 ${cpu.cluster}",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
@@ -1489,15 +1491,15 @@ private fun CpuFrequencyCard(cpuInfo: List<RootStatsCollector.CpuInfo>) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        StatColumn("Current", "${cpu.currentFreq / 1000} MHz")
-                        StatColumn("Min", "${cpu.minFreq / 1000} MHz")
-                        StatColumn("Max", "${cpu.maxFreq / 1000} MHz")
+                        StatColumn(stringResource(R.string.current), "${cpu.currentFreq / 1000} MHz")
+                        StatColumn("最低", "${cpu.minFreq / 1000} MHz")
+                        StatColumn("最高", "${cpu.maxFreq / 1000} MHz")
                     }
 
                     // Time in state visualization
                     if (cpu.timeInState.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
-                        Text("Time in State", style = MaterialTheme.typography.labelSmall)
+                        Text(stringResource(R.string.time_in_state), style = MaterialTheme.typography.labelSmall)
                         Spacer(Modifier.height(4.dp))
 
                         val totalTime = cpu.timeInState.values.sum().toFloat().coerceAtLeast(1f)
@@ -1541,9 +1543,9 @@ private fun CpuFrequencyCard(cpuInfo: List<RootStatsCollector.CpuInfo>) {
 
 @Composable
 private fun ThermalZonesCard(thermalZones: List<RootStatsCollector.ThermalZone>) {
-    StatsCard(title = "Thermal Zones", icon = Icons.Outlined.Thermostat) {
+    StatsCard(title = stringResource(R.string.thermal_zones), icon = Icons.Outlined.Thermostat) {
         if (thermalZones.isEmpty()) {
-            Text("Could not read thermal zones", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.no_thermal_data), color = MaterialTheme.colorScheme.onSurfaceVariant)
         } else {
             thermalZones.forEach { zone ->
                 val tempC = zone.tempMilliC / 1000.0
@@ -1606,15 +1608,15 @@ private fun ThermalZonesCard(thermalZones: List<RootStatsCollector.ThermalZone>)
 
 @Composable
 private fun KernelWakelocksCard(wakelocks: List<RootStatsCollector.KernelWakelockInfo>) {
-    StatsCard(title = "Kernel Wakelocks (Native)", icon = Icons.Outlined.Lock) {
+    StatsCard(title = stringResource(R.string.kernel_wakelocks), icon = Icons.Outlined.Lock) {
         if (wakelocks.isEmpty()) {
             Text(
-                "Could not read kernel wakelocks.",
+                "无法读取内核唤醒锁。",
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         } else {
             Text(
-                "Top ${wakelocks.size.coerceAtMost(15)} wakelocks by time",
+                "按时间排序的前 ${wakelocks.size.coerceAtMost(15)} 个唤醒锁",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -1633,7 +1635,7 @@ private fun KernelWakelocksCard(wakelocks: List<RootStatsCollector.KernelWakeloc
                             overflow = TextOverflow.Ellipsis
                         )
                         Text(
-                            "Count: ${wl.count} | Active: ${wl.activeCount}",
+                            "次数：${wl.count} | 活跃：${wl.activeCount}",
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

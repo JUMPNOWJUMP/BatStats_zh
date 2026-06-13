@@ -29,6 +29,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import app.batstats.R
 import app.batstats.battery.drain.DrainState
 import app.batstats.battery.drain.formatDrainRate
 import app.batstats.battery.drain.formatDuration
@@ -54,9 +56,9 @@ fun DrainStatsScreen(
             LargeTopAppBar(
                 title = {
                     Column {
-                        Text("Drain Statistics")
+                        Text(stringResource(R.string.drain_statistics))
                         Text(
-                            if (isTracking) "Tracking active" else "Tracking paused",
+                            if (isTracking) "追踪中" else "已暂停",
                             style = MaterialTheme.typography.labelMedium,
                             color = if (isTracking) 
                                 MaterialTheme.colorScheme.primary 
@@ -67,19 +69,19 @@ fun DrainStatsScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { vm.resetSession() }) {
-                        Icon(Icons.Outlined.RestartAlt, "Reset Session")
+                        Icon(Icons.Outlined.RestartAlt, "重置会话")
                     }
                     IconButton(
                         onClick = { if (isTracking) vm.stopTracking() else vm.startTracking() }
                     ) {
                         Icon(
                             if (isTracking) Icons.Default.Pause else Icons.Default.PlayArrow,
-                            if (isTracking) "Pause" else "Start"
+                            if (isTracking) "暂停" else "开始"
                         )
                     }
                 },
@@ -184,11 +186,11 @@ private fun CurrentStateCard(state: DrainState) {
             
             Column(modifier = Modifier.weight(1f)) {
                 val (icon, label, color) = when {
-                    state.isCharging -> Triple(Icons.Default.BatteryChargingFull, "Charging", MaterialTheme.colorScheme.primary)
-                    state.isDeepSleep -> Triple(Icons.Default.NightsStay, "Deep Sleep", Color(0xFF4CAF50))
-                    state.isDozing -> Triple(Icons.Default.BedtimeOff, "Dozing", Color(0xFF9C27B0))
-                    state.isScreenOn -> Triple(Icons.Default.Smartphone, "Screen On", Color(0xFFFF9800))
-                    else -> Triple(Icons.Default.PhonelinkErase, "Screen Off", Color(0xFF2196F3))
+                    state.isCharging -> Triple(Icons.Default.BatteryChargingFull, "充电中", MaterialTheme.colorScheme.primary)
+                    state.isDeepSleep -> Triple(Icons.Default.NightsStay, "深度睡眠", Color(0xFF4CAF50))
+                    state.isDozing -> Triple(Icons.Default.BedtimeOff, "轻睡", Color(0xFF9C27B0))
+                    state.isScreenOn -> Triple(Icons.Default.Smartphone, "屏幕开启", Color(0xFFFF9800))
+                    else -> Triple(Icons.Default.PhonelinkErase, "屏幕关闭", Color(0xFF2196F3))
                 }
                 
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -209,13 +211,13 @@ private fun CurrentStateCard(state: DrainState) {
                 Spacer(Modifier.height(4.dp))
                 
                 Text(
-                    "Session: ${formatDuration(state.totalTimeMs)}",
+                    "会话：${formatDuration(state.totalTimeMs)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 Text(
-                    "Total drain: ${String.format(Locale.getDefault(), "%.1f mAh", state.totalDrainMah)}",
+                    "总耗电：${String.format(Locale.getDefault(), "%.1f mAh", state.totalDrainMah)}",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -232,7 +234,7 @@ private fun DrainRatesCard(state: DrainState) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                "Drain Rates",
+                "耗电速率",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -245,25 +247,25 @@ private fun DrainRatesCard(state: DrainState) {
             ) {
                 DrainRateItem(
                     icon = Icons.Outlined.Smartphone,
-                    label = "Screen On",
+                    label = "屏幕开启",
                     rate = state.screenOnDrainRate,
                     color = Color(0xFFFF9800)
                 )
                 DrainRateItem(
                     icon = Icons.Outlined.PhonelinkErase,
-                    label = "Screen Off",
+                    label = "屏幕关闭",
                     rate = state.screenOffDrainRate,
                     color = Color(0xFF2196F3)
                 )
                 DrainRateItem(
                     icon = Icons.Outlined.NightsStay,
-                    label = "Deep Sleep",
+                    label = "深度睡眠",
                     rate = state.deepSleepDrainRate,
                     color = Color(0xFF4CAF50)
                 )
                 DrainRateItem(
                     icon = Icons.Outlined.WbSunny,
-                    label = "Awake",
+                    label = "唤醒",
                     rate = state.awakeDrainRate,
                     color = Color(0xFFE91E63)
                 )
@@ -316,7 +318,7 @@ private fun ScreenBreakdownCard(state: DrainState) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                "Screen Time Breakdown",
+                "屏幕时间分析",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -326,7 +328,7 @@ private fun ScreenBreakdownCard(state: DrainState) {
             // Screen On
             DrainStatRow(
                 icon = Icons.Outlined.Smartphone,
-                label = "Screen On",
+                label = "屏幕开启",
                 drainRate = state.screenOnDrainRate,
                 drainTotal = state.screenOnDrainMah,
                 time = state.screenOnTimeMs,
@@ -339,7 +341,7 @@ private fun ScreenBreakdownCard(state: DrainState) {
             // Screen Off
             DrainStatRow(
                 icon = Icons.Outlined.PhonelinkErase,
-                label = "Screen Off",
+                label = "屏幕关闭",
                 drainRate = state.screenOffDrainRate,
                 drainTotal = state.screenOffDrainMah,
                 time = state.screenOffTimeMs,
@@ -432,7 +434,7 @@ private fun DeepSleepCard(state: DrainState) {
                     )
                     Spacer(Modifier.width(8.dp))
                     Text(
-                        "Deep Sleep",
+                        "深度睡眠",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Medium
                     )
@@ -455,7 +457,7 @@ private fun DeepSleepCard(state: DrainState) {
             Spacer(Modifier.height(12.dp))
             
             Text(
-                "of screen-off time in deep sleep",
+                "屏幕关闭时间中的深度睡眠占比",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -485,7 +487,7 @@ private fun DeepSleepCard(state: DrainState) {
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "Time",
+                        "时间",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -497,7 +499,7 @@ private fun DeepSleepCard(state: DrainState) {
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "Drain Rate",
+                        "耗电速率",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -509,7 +511,7 @@ private fun DeepSleepCard(state: DrainState) {
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        "Total Drain",
+                        "总耗电",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -527,7 +529,7 @@ private fun ActivityBreakdownCard(state: DrainState) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                "Activity Breakdown",
+                "活动分析",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -541,7 +543,7 @@ private fun ActivityBreakdownCard(state: DrainState) {
                 // Active
                 ActivityStatItem(
                     icon = Icons.Outlined.FlashOn,
-                    label = "Active",
+                    label = "活跃",
                     drainRate = state.activeDrainRate,
                     time = state.activeTimeMs,
                     drainTotal = state.activeDrainMah,
@@ -551,7 +553,7 @@ private fun ActivityBreakdownCard(state: DrainState) {
                 // Idle
                 ActivityStatItem(
                     icon = Icons.Outlined.Bedtime,
-                    label = "Idle",
+                    label = "空闲",
                     drainRate = state.idleDrainRate,
                     time = state.idleTimeMs,
                     drainTotal = state.idleDrainMah,
@@ -561,7 +563,7 @@ private fun ActivityBreakdownCard(state: DrainState) {
                 // Awake (Screen Off)
                 ActivityStatItem(
                     icon = Icons.Outlined.WbSunny,
-                    label = "Awake",
+                    label = "唤醒",
                     drainRate = state.awakeDrainRate,
                     time = state.awakeTimeMs,
                     drainTotal = state.awakeDrainMah,
@@ -638,7 +640,7 @@ private fun SessionSummaryCard(state: DrainState) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                "Session Summary",
+                "会话摘要",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -650,17 +652,17 @@ private fun SessionSummaryCard(state: DrainState) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 SummaryItem(
-                    label = "Duration",
+                    label = "时长",
                     value = formatDuration(state.totalTimeMs),
                     icon = Icons.Outlined.Timer
                 )
                 SummaryItem(
-                    label = "Total Drain",
+                    label = "总耗电",
                     value = String.format(Locale.getDefault(), "%.1f mAh", state.totalDrainMah),
                     icon = Icons.Outlined.BatteryAlert
                 )
                 SummaryItem(
-                    label = "Avg Rate",
+                    label = "平均速率",
                     value = formatDrainRate(state.averageDrainRate),
                     icon = Icons.Outlined.Speed
                 )
@@ -704,7 +706,7 @@ private fun DrainHistoryCard(snapshots: List<app.batstats.battery.drain.DrainSna
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                "Drain History",
+                "耗电历史",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium
             )
@@ -786,7 +788,7 @@ private fun DrainHistoryCard(snapshots: List<app.batstats.battery.drain.DrainSna
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        "Collecting data...",
+                        "正在收集数据…",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

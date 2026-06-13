@@ -17,6 +17,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import app.batstats.R
 import app.batstats.viewmodel.SessionDetailsViewModel
 import kotlin.math.abs
 import java.time.Instant
@@ -35,8 +37,8 @@ fun SessionDetailsScreen(
 
     Scaffold(topBar = {
         LargeTopAppBar(
-            title = { Text("Session details") },
-            navigationIcon = { TextButton(onClick = onBack) { Text("Back") } },
+            title = { Text(stringResource(R.string.session_details)) },
+            navigationIcon = { TextButton(onClick = onBack) { Text(stringResource(R.string.back)) } },
             actions = {
 //                IconButton(onClick = { /* share later */ }) { Icon(Icons.Outlined.Share, null) }
 //                IconButton(onClick = { /* export later */ }) { Icon(Icons.Outlined.Download, null) }
@@ -60,14 +62,14 @@ fun SessionDetailsScreen(
                     Instant.ofEpochMilli(it)
                         .atZone(ZoneId.systemDefault())
                         .format(dateTimeFormatter)
-                } ?: "Active"
+                } ?: "活跃中"
             }
 
             ElevatedCard {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     Text("${ui.type} • ${ui.levelRange}", style = MaterialTheme.typography.titleMedium)
-                    Text("Start: $startStr", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text("End: $endStr", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("开始：$startStr", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("结束：$endStr", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                         ui.capacityMah?.let {
                             AssistChip(onClick = {}, label = { Text("~${it} mAh") })
@@ -83,22 +85,22 @@ fun SessionDetailsScreen(
             val tertiaryColor = MaterialTheme.colorScheme.tertiary
             val errorColor = MaterialTheme.colorScheme.error
 
-            ChartCard("Current (mA)") {
+            ChartCard("电流（mA）") {
                 val values = ui.points.map { it.currentMa?.toFloat() ?: 0f }
                 drawSeries(values, primaryColor)
             }
-            ChartCard("Voltage (mV)") {
+            ChartCard("电压（mV）") {
                 val values = ui.points.map { it.voltageMv?.toFloat() ?: 0f }
                 drawSeries(values, tertiaryColor)
             }
-            ChartCard("Temperature (°C)") {
+            ChartCard("温度（°C）") {
                 val values = ui.points.map { it.tempC?.toFloat() ?: 0f }
                 drawSeries(values, errorColor)
             }
 
             AnimatedVisibility(visible = ui.points.isEmpty(), enter = fadeIn(), exit = fadeOut()) {
                 Text(
-                    "No data points captured yet.",
+                    "暂无数据点。",
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(4.dp)
                 )

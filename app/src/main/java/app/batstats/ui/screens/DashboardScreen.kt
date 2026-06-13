@@ -94,6 +94,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import app.batstats.R
 import app.batstats.battery.data.BatteryRepository
 import app.batstats.battery.data.db.ChargeSession
 import app.batstats.battery.data.db.SessionType
@@ -144,7 +146,7 @@ fun DashboardScreen(
                                     .format(timeFormatter)
                             }
                             Text(
-                                "Updated $formatted",
+                                "更新于 $formatted",
                                 style = MaterialTheme.typography.labelMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -153,22 +155,22 @@ fun DashboardScreen(
                 },
                 actions = {
                     IconButton(onClick = onOpenHistory) {
-                        Icon(Icons.Outlined.History, "History")
+                        Icon(Icons.Outlined.History, stringResource(R.string.history))
                     }
                     IconButton(onClick = onOpenAlarms) {
-                        Icon(Icons.Outlined.Notifications, "Alarms")
+                        Icon(Icons.Outlined.Notifications, stringResource(R.string.alarms))
                     }
                     IconButton(onClick = onOpenData) {
-                        Icon(Icons.Outlined.CloudDownload, "Data")
+                        Icon(Icons.Outlined.CloudDownload, stringResource(R.string.data_export_import))
                     }
                     IconButton(onClick = onOpenDrainStats) {
-                        Icon(Icons.AutoMirrored.Outlined.ShowChart, "Drain Stats")
+                        Icon(Icons.AutoMirrored.Outlined.ShowChart, stringResource(R.string.drain_statistics))
                     }
                     IconButton(onClick = onOpenDetailedStats) {
-                        Icon(Icons.Outlined.Analytics, "Detailed Stats")
+                        Icon(Icons.Outlined.Analytics, stringResource(R.string.detailed_stats))
                     }
                     IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Outlined.Settings, "Settings")
+                        Icon(Icons.Outlined.Settings, stringResource(R.string.settings))
                     }
                 },
                 scrollBehavior = scrollBehavior
@@ -305,7 +307,7 @@ private fun CircularBatteryIndicator(
     Box(
         modifier = modifier.semantics {
             progressBarRangeInfo = ProgressBarRangeInfo(progress, 0f..1f, 0)
-            stateDescription = if (isCharging) "Charging $level%" else "Discharging $level%"
+            stateDescription = if (isCharging) "充电中 $level%" else "放电中 $level%"
         },
         contentAlignment = Alignment.Center
     ) {
@@ -345,9 +347,9 @@ private fun CircularBatteryIndicator(
                 fontWeight = FontWeight.Bold
             )
             val statusText = when {
-                isCharging && level >= 100 -> "Full"
-                isCharging -> "Charging"
-                else -> "Discharging"
+                isCharging && level >= 100 -> "已充满"
+                isCharging -> "充电中"
+                else -> "放电中"
             }
             Text(
                 text = statusText,
@@ -388,7 +390,7 @@ private fun CircularBatteryIndicator(
 
             Icon(
                 imageVector = Icons.Default.OfflineBolt,
-                contentDescription = "Charging",
+                contentDescription = "充电中",
                 modifier = Modifier
                     .size(32.dp)
                     .align(Alignment.TopEnd)
@@ -423,9 +425,9 @@ private fun ControlCenter(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text("Monitoring", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.monitoring), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        if (isMonitoring) "Running (foreground)" else "Stopped",
+                        if (isMonitoring) "运行中（前台）" else "已停止",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (isMonitoring) MaterialTheme.colorScheme.primary
                         else MaterialTheme.colorScheme.onSurfaceVariant
@@ -447,7 +449,7 @@ private fun ControlCenter(
                         Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(6.dp))
-                    Text(if (isMonitoring) "Stop" else "Start")
+                    Text(if (isMonitoring) stringResource(R.string.end) else stringResource(R.string.start_monitoring))
                 }
             }
 
@@ -463,7 +465,7 @@ private fun ControlCenter(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        "Session tracking",
+                        "会话追踪",
                         style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -472,14 +474,14 @@ private fun ControlCenter(
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             AssistChip(
                                 onClick = { onStartSession(SessionType.CHARGE) },
-                                label = { Text("Charge") },
+                                label = { Text(stringResource(R.string.charge)) },
                                 leadingIcon = {
                                     Icon(Icons.Default.BatteryChargingFull, null, Modifier.size(16.dp))
                                 }
                             )
                             AssistChip(
                                 onClick = { onStartSession(SessionType.DISCHARGE) },
-                                label = { Text("Discharge") },
+                                label = { Text(stringResource(R.string.discharge)) },
                                 leadingIcon = {
                                     Icon(Icons.Default.Battery0Bar, null, Modifier.size(16.dp))
                                 }
@@ -489,7 +491,7 @@ private fun ControlCenter(
                         TextButton(onClick = onEndSession) {
                             Icon(Icons.Default.CheckCircle, null, Modifier.size(18.dp))
                             Spacer(Modifier.width(6.dp))
-                            Text("End")
+                            Text(stringResource(R.string.end))
                         }
                     }
                 }
@@ -520,10 +522,10 @@ private fun ControlCenter(
 private fun StatsGrid(rt: BatteryRepository.Realtime) {
     val locale = remember { Locale.getDefault() }
     val stats = listOf(
-        Triple(Icons.Outlined.ElectricBolt, "Voltage", "${rt.voltageMv} mV"),
-        Triple(Icons.Outlined.SettingsPower, "Power", String.format(locale, "%.1f mW", rt.powerMw)),
-        Triple(Icons.Outlined.Thermostat, "Temperature", String.format(locale, "%.1f°C", rt.temperatureC)),
-        Triple(Icons.Outlined.Battery0Bar, "Health", getHealthString(rt.sample?.health))
+        Triple(Icons.Outlined.ElectricBolt, stringResource(R.string.voltage), "${rt.voltageMv} mV"),
+        Triple(Icons.Outlined.SettingsPower, "功率", String.format(locale, "%.1f mW", rt.powerMw)),
+        Triple(Icons.Outlined.Thermostat, stringResource(R.string.temperature), String.format(locale, "%.1f°C", rt.temperatureC)),
+        Triple(Icons.Outlined.Battery0Bar, stringResource(R.string.health), getHealthString(rt.sample?.health))
     )
 
     Row(
@@ -627,7 +629,7 @@ private fun LiveChartCard(vm: DashboardViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    "Current (last 15 minutes)",
+                    "电流（最近 15 分钟）",
                     style = MaterialTheme.typography.titleMedium
                 )
 
@@ -646,7 +648,7 @@ private fun LiveChartCard(vm: DashboardViewModel) {
                         )
                         Spacer(Modifier.width(4.dp))
                         Text(
-                            "Live",
+                            "实时",
                             style = MaterialTheme.typography.labelSmall
                         )
                     }
@@ -741,11 +743,11 @@ private fun AnimatedLineChart(
 }
 
 private fun getHealthString(health: Int?): String = when(health) {
-    2 -> "Good"
-    3 -> "Overheat"
-    4 -> "Dead"
-    5 -> "Over voltage"
-    6 -> "Failed"
-    7 -> "Cold"
-    else -> "Unknown"
+    2 -> "良好"
+    3 -> "过热"
+    4 -> "损坏"
+    5 -> "过压"
+    6 -> "故障"
+    7 -> "过冷"
+    else -> "未知"
 }
