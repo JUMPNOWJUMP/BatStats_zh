@@ -1,3 +1,51 @@
+## v6.1.1
+
+- 完整汉化：翻译 strings.xml + 修改 Kotlin 硬编码字符串 + 添加 Debug 编译工作流
+- Update compile-sdk to 37, and bump all libs...
+- Bump softprops/action-gh-release from 2 to 3 in /.github/workflows
+- Bump dependabot/fetch-metadata from 2 to 3 in /.github/workflows
+- Bump gradle/actions from 5 to 6 in /.github/workflows
+- Bump actions/upload-artifact from 6 to 7 in /.github/workflows
+- fix build, and bump dep versions
+- Use m3e components
+- bump agp to 9, jvm to 21
+- bump major ver
+- remove unneeded tasks
+- Add detailed drain stats notification (requires shizuku) (fix #5)
+- update lib ver
+- Remove old rules
+- Rm nav bar related, and other leftovers
+- Navigation 3 impl, and remove unused dialogs
+- Implement settings export
+- Update to my kmp-settings module, and use koin everywhere... (Settings Export, next commit)
+- Update README.md
+- Bump actions/upload-artifact from 5 to 6 in /.github/workflows
+- Update proguard-rules.pro
+- add shizuku rule
+- debug shizuku collection works, check with rel version
+- Update README.md
+- Add extended battery stats (most devices will definitely not have 50% of details, that is related to the OSs and hardware).
+- Bump actions/checkout from 5 to 6 in /.github/workflows
+- rm warns
+- use remember savable for better perf
+- No cost, too great (add top drainers perm either via shizuku/root or usage stats)
+- Use date formatter everywhere, add conf cache
+- Bump actions/upload-artifact from 4 to 5 in /.github/workflows
+- add the test monochrome icon
+- Bump gradle/actions from 4 to 5 in /.github/workflows
+- Fix crash on A15+ when using "Autostart with boot" and restarting
+- Only auto stop charge sessions
+- Bump build.gradle.kts
+- Fix session card data only displaying 0% -> 0%
+- Misc fixes
+- Fix graph (not sessions yet)
+- Fix monitoring button
+- Update android.yml
+- Fix widgets and improve ui for release
+- Change descs and screenshots
+- first commit
+
+
 ## v6.0.3
 
 - Bump softprops/action-gh-release from 2 to 3 in /.github/workflows
